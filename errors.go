@@ -1,7 +1,6 @@
 package eros
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 )
@@ -12,7 +11,9 @@ import (
  	things idiomatic and backwards compatible.
 
 	One aught to be able to drop in Eros and start using it interactively within one's
-	existing project without issue... as long as their compiling with Generics available
+	existing project without issue. For this reason, we fully implement IS, AS, Wrap,
+	Unwrap allowing us to be backwards compatible to previous compilers that don't
+	necessarily support those features.
 
 */
 
@@ -30,9 +31,10 @@ func New(msg string) *Error {
 var errorType = reflect.TypeOf((*error)(nil)).Elem()
 
 //Newf - New, with format. Just syntax sugar
-func Newf(format string, args ...interface{}) *Error{
+func Newf(format string, args ...interface{}) *Error {
 	return New(fmt.Sprintf(format, args...))
 }
+
 //Count - returns the depth count of the errors
 func (s Error) Count() int {
 	return s.count
@@ -62,13 +64,11 @@ func (e *Error) Unwrap() error {
 	return nil
 }
 
-// CastOrWrap - cast a non Error err to one of ours
-// or if not possible, wrap it
+// CastOrWrap - cast an interface error to an *Error. If not possible, wrap it.
 func CastOrWrap(err error) *Error {
-	if e, ok := err.(Error); ok {
+	de := dereference(err)
+	if e, ok := de.(Error); ok {
 		return &e
-	}else if e, ok := err.(*Error); ok {
-		return e
 	} else {
 		return Wrap(err, "cast to eros.Error")
 	}
@@ -107,7 +107,22 @@ func Wrapf(err error, msg string, vars ...interface{}) *Error {
 
 // Is - test for equality
 func Is(err, target error) bool {
-	return errors.Is(err, target)
+	if target == nil {
+		return err == target
+	}
+
+	isComparable := reflect.TypeOf(target).Comparable()
+	for {
+		if isComparable && err == target {
+			return true
+		}
+		if x, ok := err.(interface{ Is(error) bool }); ok && x.Is(target) {
+			return true
+		}
+		if err = Unwrap(err); err == nil {
+			return false
+		}
+	}
 }
 
 // dereference. As only works with instances, not pointers
@@ -132,7 +147,7 @@ func As(err error, target interface{}) bool {
 	}
 	val := reflect.ValueOf(target)
 	typ := val.Type()
-	if typ.Kind() != reflect.Pointer || val.IsNil() {
+	if typ.Kind() != reflect.Ptr || val.IsNil() {
 		panic("errors: target must be a non-nil pointer")
 	}
 	targetType := typ.Elem()
@@ -155,7 +170,13 @@ func As(err error, target interface{}) bool {
 
 // Unwrap -  unwrap an error
 func Unwrap(err error) error {
-	return errors.Unwrap(err)
+	u, ok := err.(interface {
+		Unwrap() error
+	})
+	if !ok {
+		return nil
+	}
+	return u.Unwrap()
 }
 
 // Error - our own version of an error, which can wrap others

@@ -78,7 +78,7 @@ func ExampleCheckAndSet() {
 	// if we fail to remove the file, we'll invoke the handler
 	Check(os.Remove("test.txt"))
 
-	// Output: Successfully got the contents for test.txtContents are: Hello Eros!
+	// Output: Successfully got the contents for test.txt
 }
 
 // ReadFileBuffer - return the contents of a file using a Result object.

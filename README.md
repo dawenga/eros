@@ -22,10 +22,21 @@ to achieve a single handler for a function, that can be safely propagated and bo
 on the contextual need.
 
 Now with the magic of Generics, Eros can achieve that goal where previously it simply wasn't possible. There have been
-third party 'generated' attempts, but they just didn't work well within the language themselves for this use case (again
-IOHO).
+third party 'generated' attempts, but they just didn't work well within the language themselves for this use case (yes
+this is a very subjective and therefore opinionated point of view).
 
 Now that we know generics will be a main line feature in 1.18, we're bringing our ideas and sharing them with the world.
+
+## But wait... Generics aren't available yet, Why publish this now?
+
+One would be correct in pointing out that Generics are slotted for go 1.18 and the official release is at 1.17. There are
+some useful reasons for adopting Eros now. First, there are a number of features we find useful that work now, the most
+prominent one being WithCuase chaining. This feature allows one to chain multiple errors instead of simply wrapping one.
+Why would this be useful? Because not every error condition is fail fast, you may wish to fail through, and simply adding
+errors to the chain per you're context / transaction is as valid a pattern as any other. We like this pattern, but it's 
+not well-supported in the current idiomatic model. That said, Eros certainly can be used in the traditional manor.
+
+That said, once 1.18 is released, one won't need to make any changes to start taking advantage of the new features.
 
 ## How it works
 
@@ -126,19 +137,23 @@ See what happens when ReadFileBuffer returns a Result type natively, we can dais
 get the string which then populates res. This is of course still type safe because of the use of ```Result[string]``` in
 the function signature of ReadFileBuffer.
 
-## Where did I come up with the idea?
+## Where did the idea come from?
 
-So, admittedly, I sort of inherited much of the concept from rust, which very eloquently handles errors with a similar
+So, admittedly, much of the Generics conceptss are based on rust, which very eloquently handles errors with a similar
 mechanism. Unlike rust however, the concept of a single error handler in your function has been sort of an appealing / 
-attempted goal that I've been after for quite some time. Now with the magic of generics, I can finally achieve the sort
-of single call check I've been after for so long... Thanks go 1.18!
+attempted goal that I've been after for quite some time. Now with the magic of generics, one finally achieve the sort
+of single call check that we've been after for so long... Thanks go 1.18!
+
+Other portions of the library, including WithCause chaining, we've been using in our own code for years now. This helps
+us get to reliable fail-through error handling, with contextual state that's been important in our orchestration code base. 
 
 ## Dependencies
 
-This will only, unfortunately work with go 1.18+ and you should get a compile error if you're using a compiler previous 
-to that one.
+The go 1.18+ features are guarded with a build block at the top of the file, this means that one should be able to use 
+the non-generics based features of Eros now, with any project. We also have fully implemented IS, AS, Wrap & Unwrap so, 
+if those interfaces are not currently available in your build chain, they should still work as expected and be available.
 
-The unit tests depend on github.com/pkg/errors but the module is otherwise internally relent on just the go runtime
+The unit tests depend on github.com/pkg/errors but the module is otherwise internally reliant on just the go runtime
 
 ## Conclusions
 
