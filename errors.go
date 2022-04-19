@@ -95,7 +95,7 @@ func (e *Error) WithCause(err error) *Error {
 		} else {
 			e.next = v
 		}
-		e.count = (v.count + 1)
+		e.count = v.count + 1
 	}
 	return e
 }
@@ -114,6 +114,9 @@ func Is(err, target error) bool {
 	isComparable := reflect.TypeOf(target).Comparable()
 	for {
 		if isComparable && err == target {
+			return true
+		}
+		if isComparable && err.Error() == target.Error() {
 			return true
 		}
 		if x, ok := err.(interface{ Is(error) bool }); ok && x.Is(target) {

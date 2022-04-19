@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	NewErrorInstance = New("This is an eros Error")
+	NewErrorInstance      = New("This is an eros Error")
+	ComparedErrorInstance = New("This is an eros Error")
 )
 
 func TestAs(t *testing.T) {
@@ -89,6 +90,14 @@ func TestIs(t *testing.T) {
 				&Error{},
 			},
 			false,
+		},
+		{
+			"Test Error that should be comparable to even though they are different",
+			args{
+				ComparedErrorInstance,
+				NewErrorInstance,
+			},
+			true,
 		},
 	}
 	for _, tt := range tests {
