@@ -1,6 +1,3 @@
-//go:build go1.18
-// +build go1.18
-
 package eros
 
 // Result - represents the traditional (value, error) tuple as an actual return

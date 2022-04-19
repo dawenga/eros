@@ -1,6 +1,3 @@
-//go:build go1.18
-// +build go1.18
-
 package eros
 
 import (
@@ -70,7 +67,7 @@ func ExampleCheckAndSet() {
 
 	res = ReadFileBuffer("test.txt").Check()
 	if len(res) == 0 {
-		e.WithCause(Newf("failed to assert res is 0. res is; %s", res))
+		e.WithCause(NewErrorf("failed to assert res is 0. res is; %s", res))
 	} else {
 		fmt.Printf("Successfully got the contents for test.txt")
 	}
