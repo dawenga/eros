@@ -36,8 +36,8 @@ func Newf(format string, args ...interface{}) *Error {
 }
 
 //Count - returns the depth count of the errors
-func (s Error) Count() int {
-	return s.count
+func (e Error) Count() int {
+	return e.count
 }
 
 //Error - implement the error interface
