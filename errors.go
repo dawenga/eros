@@ -3,6 +3,7 @@ package eros
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 /*
@@ -65,12 +66,16 @@ func (e *Error) Unwrap() error {
 }
 
 // CastOrWrap - cast an interface error to an *Error. If not possible, wrap it.
-func CastOrWrap(err error) *Error {
+func CastOrWrap(err error, mesgs ...string) *Error {
+	msg := "cast to eros.Error"
+	if len(mesgs) > 0 {
+		msg = strings.Join(mesgs, ",")
+	}
 	de := dereference(err)
 	if e, ok := de.(Error); ok {
 		return &e
 	} else {
-		return Wrap(err, "cast to eros.Error")
+		return Wrap(err, msg)
 	}
 }
 

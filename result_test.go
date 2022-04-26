@@ -15,8 +15,8 @@ func ExampleCheck() {
 		fmt.Println(err.Unwrap())
 	})()
 
-	fl := Cast(os.Open("/opt/abc/baddir/file")).Check()
-	defer fl.Close()
+	fl := Cast(os.Open("/opt/abc/baddir/file")).Check("failed to open file")
+	defer fl.Close() //note that any cast will contain this message
 
 	// Output: open /opt/abc/baddir/file: no such file or directory
 
