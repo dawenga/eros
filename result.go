@@ -13,9 +13,9 @@ type Result[T any] struct {
 type Handler func(res *Error)
 
 // Check - raises a panic if err != nil
-func (r Result[T]) Check() T {
+func (r Result[T]) Check(mesgs ...string) T {
 	if r.Error != nil {
-		panic(CastOrWrap(r.Error))
+		panic(CastOrWrap(r.Error, mesgs...))
 	}
 	return r.Value
 }
@@ -31,9 +31,9 @@ func (r Result[T]) Handle(handler Handler) T {
 
 // Check - is used to apply a default handler (or a full on panic) to an existing
 // function that only returns an error.
-func Check(err error) {
+func Check(err error, mesgs ...string) {
 	if err != nil {
-		panic(CastOrWrap(err))
+		panic(CastOrWrap(err, mesgs...))
 	}
 	return
 }
