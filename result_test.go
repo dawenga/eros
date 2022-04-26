@@ -44,6 +44,32 @@ func ExampleHandle() {
 	// Output: open /opt/abc/baddir/file: no such file or directory
 }
 
+// ExampleCheckNotNil - demonstrates the usage of CheckNotNil()
+func ExampleCheckNotNil() {
+
+	// Top level error handler
+	defer ErrorHandler(func(err *Error) {
+		fmt.Println(err.Error())
+	})() // <-- don't forget (), or your panic will propagate all the way out
+
+	// nil int
+	var ni *int
+	a := 1
+	ni = &a
+
+	v := CheckNotNil(ni, "ni is pointing to a real value")
+
+	fmt.Printf("v is 1 because it's a copy of the pointer ni %d", *v)
+
+	ni = nil
+
+	v = CheckNotNil(ni, "ni is now nil")
+	fmt.Printf("we'll never get here because ni is nil and v isn't assigned; %d", *v)
+
+	// Output: v is 1 because it's a copy of the pointer ni 1 ni is now nil (cause count 0)
+
+}
+
 // ExampleCheckAndSet -Test both the global handler (in ReadFileBuffer) and a
 // local handler. A local handler isn't run on the defer (or on the way out)
 // which is useful if you want to fail through and keep going
@@ -67,7 +93,7 @@ func ExampleCheckAndSet() {
 
 	res = ReadFileBuffer("test.txt").Check()
 	if len(res) == 0 {
-		e.WithCause(NewErrorf("failed to assert res is 0. res is; %s", res))
+		e.WithCause(Newf("failed to assert res is 0. res is; %s", res))
 	} else {
 		fmt.Printf("Successfully got the contents for test.txt")
 	}

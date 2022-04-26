@@ -1,5 +1,7 @@
 package eros
 
+import "reflect"
+
 // Result - represents the traditional (value, error) tuple as an actual return
 // type.
 type Result[T any] struct {
@@ -34,6 +36,15 @@ func Check(err error) {
 		panic(CastOrWrap(err))
 	}
 	return
+}
+
+// CheckNotNil - Prove val isn't nil and return val, otherwise invoke the error handler
+func CheckNotNil[T any](val T, msg string) T {
+	v := reflect.ValueOf(val)
+	if v.IsNil() {
+		panic(New(msg))
+	}
+	return val
 }
 
 // CheckVal (checks) without casting and returns the value portion of the value/error
